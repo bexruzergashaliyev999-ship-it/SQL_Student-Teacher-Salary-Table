@@ -1,9 +1,3 @@
-## -------------------------------------- ##
-If you want to use this you need db file 
-For instance: maktab.db
-## -------------------------------------- ##
-
-
 import sqlite3
 
 connection = sqlite3.connect("maktab.db")
@@ -20,7 +14,8 @@ def jadval_yaratish(cursor):
         baho INTEGER NOT NULL CHECK(baho BETWEEN 1 AND 5)
     ) """)
     connection.commit()
-    print("Jadval yaratildi!")
+    print("Table created successfully!")
+
 
 def jadval_yaratish2(cursor):
     cursor.execute(""" CREATE TABLE IF NOT EXISTS oqituvchilar(
@@ -32,43 +27,46 @@ def jadval_yaratish2(cursor):
         fan TEXT NOT NULL
         ) """)
     connection.commit()
-    print("Jadval yaratildi!")
+    print("Table created successfully!")
+
 
 def oqituvchi_qoshish(cursor):
     cursor.execute("SELECT COUNT(*) FROM oqituvchilar")
     oqituvchilar_soni = cursor.fetchone()[0]
 
     if oqituvchilar_soni < 10:
-        ism = input("oqituvchining  ismi: ")
-        familiya = input("oqituvchining  familiyasi: ")
-        sertifikat = input("oqituvchining sertifikati (ielts,cefr,toeful): ")
-        fan = input("oqituvchining  fani: ")
-        oylik = int(input("oqituvchining oyligi: "))
+        ism = input("Teacher's first name: ")
+        familiya = input("Teacher's last name: ")
+        sertifikat = input("Teacher's certificate (ielts, cefr, toefl): ")
+        fan = input("Teacher's subject: ")
+        oylik = int(input("Teacher's salary: "))
 
-        
-
-        cursor.execute('''INSERT INTO oqituvchilar(ism, familiya, sertifikat, oylik, fan) VALUES (?,?,?,?,?) ''', (ism, familiya, sertifikat, oylik, fan))
+        cursor.execute(
+            '''INSERT INTO oqituvchilar(ism, familiya, sertifikat, oylik, fan) VALUES (?,?,?,?,?)''',
+            (ism, familiya, sertifikat, oylik, fan),
+        )
 
         connection.commit()
-        print("oqituvchi qo'shildi!")
+        print("Teacher added successfully!")
 
     else:
-        print("10 ta oqituvchi allaqachon qo'shilgan!")
-
+        print("10 teachers have already been added!")
 
 
 def top_salary(cursor):
-    cursor.execute('''SELECT * FROM oqituvchilar ORDER BY oylik DESC LIMIT 3''')
+    cursor.execute(
+        '''SELECT * FROM oqituvchilar ORDER BY oylik DESC LIMIT 3'''
+    )
 
     oqituvchilar = cursor.fetchall()
 
     if oqituvchilar:
-        print("Eng kop oylik oladigan oqituvchilar:")
+        print("Top highest-paid teachers:")
 
         for o in oqituvchilar:
             print(o)
     else:
-        print("Oqituvchi yoq")
+        print("No teachers found.")
 
 
 def salary(cursor):
@@ -77,12 +75,14 @@ def salary(cursor):
     oqituvchilar = cursor.fetchall()
 
     if oqituvchilar:
-        print("Barcha Oqituvchilar va ularning oyligi:")
+        print("All teachers and their salaries:")
 
         for oqituvchi in oqituvchilar:
-            print(f"Ism: {oqituvchi[0]}, Familiya: {oqituvchi[1]}, Oylik: {oqituvchi[2]}")
+            print(
+                f"First Name: {oqituvchi[0]}, Last Name: {oqituvchi[1]}, Salary: {oqituvchi[2]}"
+            )
     else:
-        print("Hali oyliklar kiritilmagan!!!")
+        print("No salaries entered yet!")
 
 
 def talabalar_qoshish(cursor):
@@ -90,22 +90,25 @@ def talabalar_qoshish(cursor):
     talabalar_soni = cursor.fetchone()[0]
 
     if talabalar_soni < 10:
-        ism = input("Talabaning ismi: ")
-        familiya = input("Talabaning familiyasi: ")
-        yosh = int(input("Talabaning yoshi: "))
-        fan = input("Talabaning fani: ")
-        baho = int(input("Talabaning bahosi: "))
+        ism = input("Student's first name: ")
+        familiya = input("Student's last name: ")
+        yosh = int(input("Student's age: "))
+        fan = input("Student's subject: ")
+        baho = int(input("Student's grade: "))
 
-        cursor.execute('''
+        cursor.execute(
+            '''
         INSERT INTO talabalar(ism, familiya, yosh, fan, baho)
         VALUES (?,?,?,?,?)
-        ''', (ism, familiya, yosh, fan, baho))
+        ''',
+            (ism, familiya, yosh, fan, baho),
+        )
 
         connection.commit()
-        print("Talaba qo'shildi!")
+        print("Student added successfully!")
 
     else:
-        print("10 ta talaba allaqachon qo'shilgan!")
+        print("10 students have already been added!")
 
 
 def top_student(cursor):
@@ -114,13 +117,13 @@ def top_student(cursor):
     student = cursor.fetchone()
 
     if student:
-        print("Eng yuqori baho olgan talaba:", student)
+        print("Top student with the highest grade:", student)
 
         for s in student:
             print(s)
 
     else:
-        print("Talaba yo'q")
+        print("No students found.")
 
 
 def bad_students(cursor):
@@ -129,62 +132,66 @@ def bad_students(cursor):
     student = cursor.fetchone()
 
     if student:
-        print("Eng past baho olgan talaba:", student)
+        print("Student with the lowest grade:", student)
 
     else:
-        print("Talaba yo'q")
+        print("No students found.")
 
 
 def search_student(cursor):
-    ism_qidiruv = input("Qidirilayotgan talaba ismi: ")
+    ism_qidiruv = input("Enter the name of the student to search: ")
 
-    cursor.execute("""SELECT * FROM talabalar WHERE ism LIKE ?""",(f"{ism_qidiruv}",))
+    cursor.execute(
+        """SELECT * FROM talabalar WHERE ism LIKE ?""", (f"{ism_qidiruv}",)
+    )
 
     students = cursor.fetchone()
 
     if students:
-        print("Topildi Talaba:", students)
+        print("Student found:", students)
 
     else:
-        print("Talaba topilmadi!")
+        print("Student not found!")
 
 
 def delete_student(cursor):
-    ism = input("Ochirish uchun talaba ismini kiriting: ")
+    ism = input("Enter the name of the student to delete: ")
 
-    cursor.execute("""SELECT * FROM talabalar WHERE ism = ?""",(ism,))
+    cursor.execute("""SELECT * FROM talabalar WHERE ism = ?""", (ism,))
 
     talaba = cursor.fetchone()
 
     if talaba is None:
-        print("Talaba topilmadi!")
+        print("Student not found!")
         return
 
-    cursor.execute("""DELETE FROM talabalar WHERE ism = ?""",(ism,))
+    cursor.execute("""DELETE FROM talabalar WHERE ism = ?""", (ism,))
 
     connection.commit()
 
-    print("Talaba ochirildi!")
+    print("Student deleted successfully!")
 
 
 def update_student(cursor):
-    ism = input("Yangilash uchun talaba ismini kiriting: ")
+    ism = input("Enter the name of the student to update: ")
 
-    cursor.execute("""SELECT * FROM talabalar WHERE ism = ?""",(ism,))
+    cursor.execute("""SELECT * FROM talabalar WHERE ism = ?""", (ism,))
 
     talaba = cursor.fetchone()
 
     if talaba is None:
-        print("Talaba topilmadi!")
+        print("Student not found!")
         return
 
-    baho = int(input("Yangi bahoni kiriting: "))
+    baho = int(input("Enter the new grade: "))
 
-    cursor.execute("""UPDATE talabalar SET baho = ? WHERE ism = ?""",(baho, ism))
+    cursor.execute(
+        """UPDATE talabalar SET baho = ? WHERE ism = ?""", (baho, ism)
+    )
 
     connection.commit()
 
-    print("Talabaning bahosi yangilandi!")
+    print("Student's grade updated successfully!")
 
 
 def umumiy(cursor):
@@ -192,9 +199,7 @@ def umumiy(cursor):
 
     umumiyson = cursor.fetchone()[0]
 
-    print("Jami talaba:", umumiyson)
-
-
+    print("Total students:", umumiyson)
 
 
 def main():
@@ -202,23 +207,23 @@ def main():
     jadval_yaratish2(cursor)
 
     while True:
-        print("\n--- Siz student yoki manager? ---")
+        print("\n--- Are you a student or a manager? ---")
         print("1 - Manager")
         print("2 - Student")
-        print("3 - Chiqish")
+        print("3 - Exit")
 
-        choice1 = input("Tanlov: ")
+        choice1 = input("Choice: ")
 
         if choice1 == "2":
 
             while True:
-                print("\n--- Student menyusi ---")
-                print("1 - Top talaba")
-                print("2 - Eng past baholi talaba")
-                print("3 - Talaba qidirish")
-                print("4 - Orqaga")
+                print("\n--- Student Menu ---")
+                print("1 - Top student")
+                print("2 - Lowest grade student")
+                print("3 - Search student")
+                print("4 - Back")
 
-                choice = input("Tanlov: ")
+                choice = input("Choice: ")
 
                 if choice == "1":
                     top_student(cursor)
@@ -233,28 +238,28 @@ def main():
                     break
 
                 else:
-                    print("Bunday tanlov yoq")
+                    print("Invalid choice!")
 
         elif choice1 == "1":
 
             code = 7755
-            code1 = int(input("-- Code: "))
+            code1 = int(input("-- Enter Code: "))
 
             if code1 == code:
 
                 while True:
-                    print("\n--- Manager menyusi ---")
-                    print("1 - Talaba qoshish")
-                    print("2 - Talabani yangilash")
-                    print("3 - Talabani ochirish")
-                    print("4 - Jami talaba")
+                    print("\n--- Manager Menu ---")
+                    print("1 - Add student")
+                    print("2 - Update student")
+                    print("3 - Delete student")
+                    print("4 - Total students")
                     print(" -- -- -- -- -- -- -- -- ")
-                    print("5 - oqituvchi qoshish")
-                    print("6 - eng kop oylik oladigan oqituvchilar")
-                    print("7 - oyliklarni korish")
-                    print("8 - chiqish")
+                    print("5 - Add teacher")
+                    print("6 - Top highest-paid teachers")
+                    print("7 - View salaries")
+                    print("8 - Exit")
 
-                    choice3 = input("Tanlov: ")
+                    choice3 = input("Choice: ")
 
                     if choice3 == "1":
                         talabalar_qoshish(cursor)
@@ -281,17 +286,17 @@ def main():
                         break
 
                     else:
-                        print("Bunday tanlov yoq")
+                        print("Invalid choice!")
 
             else:
-                print("Kod notogri")
+                print("Incorrect code!")
 
         elif choice1 == "3":
-            print("TUGADI")
+            print("GOODBYE")
             break
 
         else:
-            print("bor narsani tanla axmoq")
+            print("Please choose a valid option!")
 
     connection.close()
 
